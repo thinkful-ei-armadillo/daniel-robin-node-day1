@@ -111,15 +111,15 @@ app.get("/apps", (req, res) => {
   const sort = req.query.sort;
   const genres = req.query.genres;
 
+  if (sort === 'App') {
+    store.sort( (a, b) => { return a.App.charCodeAt(0) - b.App.charCodeAt(0); });
+  }
+
+  if (sort === 'Rating') {
+    store.sort((a, b) => { return b.Rating - a.Rating; });
+  }
+
   let results = [];
-
-  if (!sort) {
-    res.status(200).send('Please provide a sorting parameter, by Rating or by App name.');
-  }
-
-  if (!genres) {
-    res.status(200).send('Please provide one of these genres: Action, Puzzle, Strategy, Casual, Arcade, or Card.');
-  }
 
   if (genres === 'Action') {
     results.push(store.filter( app => app.Genres.includes('Action')));
@@ -145,31 +145,6 @@ app.get("/apps", (req, res) => {
     results.push(store.filter( app => app.Genres.includes('Card')));
   }
 
-  if (sort === 'App') {
-    // results.sort( (a, b) => {a.App.charCodeAt(0) < b.App.charCodeAt(0);});
-
-    function compare(a,b) {
-      const appA = a.App.toUpperCase();
-      const appB = b.App.toUpperCase();
-
-      let comparison = 0;
-      if (appA > appB) {
-        comparison = 1;
-      }
-      else if (appA < appB) {
-        comparison -1;
-      }
-      return comparison;
-    }
-    results.sort(compare);
-  }
-
-  if (sort === 'Rating') {
-    results.sort((a, b) => {
-      return a.Rating > b.Rating;
-    });
-  }
-  console.log(results);
   res.send(results);
 });
 
