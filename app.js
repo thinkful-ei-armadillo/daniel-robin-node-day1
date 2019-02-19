@@ -1,9 +1,12 @@
+/* eslint-disable no-inner-declarations */
 /* eslint-disable quotes */
 "use strict";
 const express = require("express");
 const morgan = require("morgan");
+const store = require("./store");
 const app = express();
 app.use(morgan("dev"));
+// app.use(store);
 
 app.get("/", (req, res) => {
   res.send("Welcome to Express!");
@@ -27,6 +30,7 @@ app.get("/sum", (req, res) => {
   res.send(`The sum of a and b is ${sum}!`);
 });
 
+// CIPHER solution
 app.get("/cipher", (req, res) => {
   const text = req.query.text;
   const shift = req.query.shift;
@@ -67,6 +71,8 @@ app.get("/cipher", (req, res) => {
 
   res.send(`Encrypted code is ${result}`);
 });
+
+// LOTTO solution
 app.get("/lotto", (req, res) => {
   const { numbers } = req.query;
   if (!numbers) {
@@ -89,15 +95,82 @@ app.get("/lotto", (req, res) => {
   }
   let results = randomNumber.filter(num => !numbersArr.includes(num) );
   if(results.length === 0){
-    res.send('Wow! Unbelievable! You could have won the mega millions!')
+    res.send('Wow! Unbelievable! You could have won the mega millions!');
   } else if(results.length === 1){
-    res.send('Congrats you won $100')
+    res.send('Congrats you won $100');
   } else if(results.length === 2){
-    res.send('Congrats you won a free ticket')
+    res.send('Congrats you won a free ticket');
   } else {
     res.send('you lose');
   }
   
+});
+
+// APPS search solution
+app.get("/apps", (req, res) => {
+  const sort = req.query.sort;
+  const genres = req.query.genres;
+
+  let results = [];
+
+  if (!sort) {
+    res.status(200).send('Please provide a sorting parameter, by Rating or by App name.');
+  }
+
+  if (!genres) {
+    res.status(200).send('Please provide one of these genres: Action, Puzzle, Strategy, Casual, Arcade, or Card.');
+  }
+
+  if (genres === 'Action') {
+    results.push(store.filter( app => app.Genres.includes('Action')));
+  }
+
+  if (genres === 'Puzzle') {
+    results.push(store.filter( app => app.Genres.includes('Puzzle')));
+  }
+
+  if (genres === 'Strategy') {
+    results.push(store.filter( app => app.Genres.includes('Strategy')));
+  }
+
+  if (genres === 'Casual') {
+    results.push(store.filter( app => app.Genres.includes('Casual')));
+  }
+
+  if (genres === 'Arcade') {
+    results.push(store.filter( app => app.Genres.includes('Arcade')));
+  }
+
+  if (genres === 'Card') {
+    results.push(store.filter( app => app.Genres.includes('Card')));
+  }
+
+  if (sort === 'App') {
+    // results.sort( (a, b) => {a.App.charCodeAt(0) < b.App.charCodeAt(0);});
+
+    function compare(a,b) {
+      const appA = a.App.toUpperCase();
+      const appB = b.App.toUpperCase();
+
+      let comparison = 0;
+      if (appA > appB) {
+        comparison = 1;
+      }
+      else if (appA < appB) {
+        comparison -1;
+      }
+      return comparison;
+    }
+    results.sort(compare);
+  }
+
+  if (sort === 'Rating') {
+    results.sort((a, b) => {
+      return a.Rating > b.Rating;
+    });
+  }
+  console.log(results);
+  res.send(results);
 });
 
 // setting app to listen on correct port
