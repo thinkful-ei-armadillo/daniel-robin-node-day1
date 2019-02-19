@@ -145,7 +145,12 @@ app.get("/apps", (req, res) => {
     results.push(store.filter( app => app.Genres.includes('Card')));
   }
 
-  res.send(results);
+  if (!sort && !genres) {
+    res.send(store);
+  }
+  else {
+    res.send(results);
+  }
 });
 
 // setting app to listen on correct port
